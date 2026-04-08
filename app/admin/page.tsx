@@ -4,6 +4,7 @@
 import Link           from 'next/link'
 import { createAdminClient } from '@/lib/supabase/admin'
 import SyncStatus     from '@/components/admin/SyncStatus'
+import SeedButton     from '@/components/admin/SeedButton'
 import type { SyncJob } from '@/types'
 
 async function getStats() {
@@ -55,6 +56,15 @@ export default async function AdminDashboard() {
         </p>
         <SyncStatus lastJob={lastJob} />
       </section>
+
+      <hr className="separator mb-10" />
+
+      {/* Datos de muestra — solo en desarrollo */}
+      {process.env.NODE_ENV !== 'production' && (
+        <section className="mb-10">
+          <SeedButton />
+        </section>
+      )}
 
       <hr className="separator mb-10" />
 
