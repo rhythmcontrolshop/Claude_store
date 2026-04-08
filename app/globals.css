@@ -1,22 +1,30 @@
+/* ============================================================
+   RHYTHM CONTROL — GLOBALS
+   Este archivo NO define valores. Solo:
+   1. Importa los design tokens desde styles/variables.css
+   2. Mapea los tokens al @theme de Tailwind v4
+   3. Define utilidades CSS globales que no tienen equivalente Tailwind
+   Para cambiar colores, fuentes o espaciados → edita styles/variables.css
+   ============================================================ */
+
+@import "../styles/variables.css";
 @import "tailwindcss";
 
-/* ─── RHYTHM CONTROL — DESIGN SYSTEM ─────────────────────────────────────── */
 
-@theme {
-  /* Colors */
-  --color-background: #000000;
-  --color-foreground: #ffffff;
-  --color-accent: #F0E040;
-  --color-separator: #1c1c1c;
+/* ── MAP TOKENS → TAILWIND v4 @THEME ──────────────────────── */
 
-  /* Typography — Display */
-  --font-display: "Arial Black", Arial, sans-serif;
+@theme inline {
+  --color-background:  var(--rc-color-bg);
+  --color-foreground:  var(--rc-color-text);
+  --color-accent:      var(--rc-color-accent);
+  --color-separator:   var(--rc-color-separator);
+  --color-muted:       var(--rc-color-muted);
 
-  /* Typography — Mono / Metadata */
-  --font-mono: "IBM Plex Mono", "Courier New", monospace;
+  --font-display:      var(--rc-font-display);
+  --font-mono:         var(--rc-font-mono);
 
-  /* Border radius: always zero */
-  --radius: 0;
+  /* Sin border-radius en ningún elemento */
+  --radius:    0;
   --radius-sm: 0;
   --radius-md: 0;
   --radius-lg: 0;
@@ -25,7 +33,8 @@
   --radius-full: 0;
 }
 
-/* ─── GLOBAL RESET ────────────────────────────────────────────────────────── */
+
+/* ── RESET GLOBAL ───────────────────────────────────────────── */
 
 *,
 *::before,
@@ -35,67 +44,78 @@
 }
 
 html {
-  background-color: #000000;
-  color: #ffffff;
+  background-color: var(--rc-color-bg);
+  color: var(--rc-color-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  background-color: #000000;
-  color: #ffffff;
-  font-family: "IBM Plex Mono", "Courier New", monospace;
-  letter-spacing: 0.07em;
+  background-color: var(--rc-color-bg);
+  color: var(--rc-color-text);
+  font-family: var(--rc-font-mono);
+  font-size: var(--rc-text-sm);
+  letter-spacing: var(--rc-tracking-mono);
   margin: 0;
   padding: 0;
+  min-height: 100dvh;
 }
 
-/* ─── TYPOGRAPHY UTILITIES ────────────────────────────────────────────────── */
 
-/* Display: Arial Black, uppercase, tight tracking */
+/* ── TIPOGRAFÍA — UTILIDADES GLOBALES ───────────────────────── */
+
+/* Display: Arial Black — títulos, artistas, géneros */
 .font-display {
-  font-family: "Arial Black", Arial, sans-serif;
+  font-family: var(--rc-font-display);
   font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: -0.04em;
+  letter-spacing: var(--rc-tracking-display);
 }
 
-/* Mono: IBM Plex Mono, wide tracking */
+/* Mono: IBM Plex Mono — metadata, precios, BPM, catno */
 .font-meta {
-  font-family: "IBM Plex Mono", "Courier New", monospace;
-  letter-spacing: 0.07em;
+  font-family: var(--rc-font-mono);
+  letter-spacing: var(--rc-tracking-mono);
 }
 
-/* ─── SEPARATOR UTILITIES ─────────────────────────────────────────────────── */
 
-.separator-main {
+/* ── SEPARADORES ────────────────────────────────────────────── */
+
+.separator {
   border: none;
-  border-top: 2px solid #ffffff;
+  border-top: var(--rc-border-main);
 }
 
 .separator-card {
   border: none;
-  border-top: 1px solid #1c1c1c;
+  border-top: var(--rc-border-card);
 }
 
-/* ─── ACCENT UTILITIES ────────────────────────────────────────────────────── */
 
-/* Accent yellow — only for: active tab, BPM tag, M/NM badge */
+/* ── ACENTO ─────────────────────────────────────────────────── */
+
+/* Solo para: tab activo, BPM tag, badge M/NM */
 .accent {
-  color: #F0E040;
+  color: var(--rc-color-accent);
 }
 
 .accent-bg {
-  background-color: #F0E040;
-  color: #000000;
+  background-color: var(--rc-color-accent);
+  color: var(--rc-color-bg);
 }
 
 .tab-active {
-  color: #F0E040;
-  border-bottom: 2px solid #F0E040;
+  color: var(--rc-color-accent);
+  border-bottom: var(--rc-border-accent);
 }
 
-/* ─── SCROLLBAR ───────────────────────────────────────────────────────────── */
+
+/* ── PRECIOS (formato Euro) ─────────────────────────────────── */
+/* Usar en JS: price.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' }) */
+/* Resultado: 1.234,56 € */
+
+
+/* ── SCROLLBAR ──────────────────────────────────────────────── */
 
 ::-webkit-scrollbar {
   width: 4px;
@@ -103,16 +123,26 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #000000;
+  background: var(--rc-color-bg);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #ffffff;
+  background: var(--rc-color-text);
 }
 
-/* ─── FOCUS ───────────────────────────────────────────────────────────────── */
+
+/* ── FOCUS ──────────────────────────────────────────────────── */
 
 :focus-visible {
-  outline: 2px solid #F0E040;
+  outline: 2px solid var(--rc-color-accent);
   outline-offset: 2px;
+}
+
+
+/* ── LAYOUT BASE ────────────────────────────────────────────── */
+
+/* Compensar altura de nav fija en el contenido */
+.page-content {
+  padding-top: var(--rc-nav-height);
+  padding-bottom: var(--rc-player-height);
 }
