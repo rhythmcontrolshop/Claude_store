@@ -20,7 +20,7 @@ const MOCK_EVENTS = [
 
 const MIX = {
   // Reemplazar con URL real de Mixcloud cuando esté disponible
-  embed: 'https://www.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&autoplay=0&feed=%2Frhythmcontrolbcn%2F',
+  embed: 'https://www.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&autoplay=0&feed=%2Frhythmcontrolshop%2F',
   dj:       'RC SELECTOR',
   subtitle: 'Selección mensual — Abril 2026',
   tracklist: 'Strings of Life · Move Your Body · Pacific State · I Feel Love · Da Funk · Can You Feel It · Promised Land · Supernature · So What · Mystery of Love',
