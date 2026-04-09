@@ -10,7 +10,7 @@ interface RecordGridProps {
   releases:  Release[]
   loading:   boolean
   onSelect:  (release: Release)     => void
-  onPlay:    (track: PlayerTrack)   => void
+  onPlay:    (track: PlayerTrack, clipIndex: number) => void
 }
 
 export default function RecordGrid({ releases, loading, onSelect, onPlay }: RecordGridProps) {

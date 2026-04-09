@@ -3,6 +3,7 @@
 // Server Component: obtiene releases iniciales y géneros directamente de Supabase.
 
 import Navigation    from '@/components/layout/Navigation'
+import Hero          from '@/components/home/Hero'
 import CatalogueView from '@/components/store/CatalogueView'
 import { createClient } from '@/lib/supabase/server'
 import type { Release } from '@/types'
@@ -48,6 +49,7 @@ export default async function Home() {
           backgroundColor: 'var(--rc-color-bg)',
         }}
       >
+        <Hero releases={releases} />
         <CatalogueView
           initialReleases={releases}
           initialTotal={total}
