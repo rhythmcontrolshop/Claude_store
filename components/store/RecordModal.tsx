@@ -5,6 +5,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import type { Release, PlayerTrack } from '@/types'
+import { TrackPlayers } from '@/components/player/TrackPlayers'
 
 interface RecordModalProps {
   release:  Release
@@ -75,12 +76,13 @@ export default function RecordModal({ release, releases = [], onClose, onPlay, o
   const [crossSellArtist, setCrossSellArtist] = useState<Release[]>([])
   const [crossSellLabel, setCrossSellLabel] = useState<Release[]>([])
   const [activeTab, setActiveTab] = useState<TabType>(openTab || 'tracklist')
-  const [playingTrack, setPlayingTrack] = useState<number | null>(null)
-  const [previewUrls, setPreviewUrls] = useState<Record<number, string | null>>({})
   const [showBack, setShowBack] = useState(false)
   
   const isAccentCondition = ACCENT_CONDITIONS.includes(release.condition)
-  const tracklist = MOCK_TRACKLIST[release.title] || []
+  // Use real tracklist from Supabase when available, fall back to mock data
+  const tracklist = release.discogs_tracklist?.length
+    ? release.discogs_tracklist
+    : (MOCK_TRACKLIST[release.title] || []).map(t => ({ position: t.side, title: t.track, duration: t.duration }))
 
   const currentIndex = releases.findIndex(r => r.id === release.id)
   const prevRelease = currentIndex > 0 ? releases[currentIndex - 1] : null
@@ -125,51 +127,6 @@ export default function RecordModal({ release, releases = [], onClose, onPlay, o
       document.body.style.overflow = ''
     }
   }, [onClose, prevRelease, nextRelease, onSelect])
-
-  // Buscar previews de Spotify para cada track
-  useEffect(() => {
-    async function fetchPreviews() {
-      if (!release.spotify_id) return
-      
-      const urls: Record<number, string | null> = {}
-      
-      for (let i = 0; i < tracklist.length; i++) {
-        try {
-          const res = await fetch(`/api/audio/spotify/${release.spotify_id}`)
-          const data = await res.json()
-          urls[i] = data.preview_url || null
-          // Por ahora usamos el mismo preview para todos los tracks
-          // En producción buscaríamos cada track individualmente
-        } catch {
-          urls[i] = null
-        }
-      }
-      
-      setPreviewUrls(urls)
-    }
-    
-    if (tracklist.length > 0 && activeTab === 'tracklist') {
-      fetchPreviews()
-    }
-  }, [release.spotify_id, tracklist, activeTab])
-
-  const handlePlayTrack = (trackIndex: number) => {
-    setPlayingTrack(trackIndex)
-    const track: PlayerTrack = {
-      release_id: release.id,
-      title: tracklist[trackIndex].track,
-      artist: release.artists[0] ?? '',
-      cover_image: release.cover_image,
-      source: 'spotify',
-      source_id: release.spotify_id ?? '',
-      bpm: release.bpm,
-      key: release.key_camelot ?? release.key,
-      price: release.price,
-      currency: release.currency,
-      shopify_variant_id: release.shopify_variant_id,
-    }
-    onPlay(track, trackIndex + 1)
-  }
 
   const availableTabs = tabs.filter(t => t.available)
 
@@ -315,51 +272,11 @@ export default function RecordModal({ release, releases = [], onClose, onPlay, o
 
                 <div className="min-h-[80px]">
                   {activeTab === 'tracklist' && tracklist.length > 0 && (
-                    <div className="flex flex-col gap-1">
-                      {tracklist.map((t, i) => {
-                        const isPlaying = playingTrack === i
-                        const hasPreview = previewUrls[i] !== undefined
-                        
-                        return (
-                          <div
-                            key={i}
-                            className="flex items-center justify-between py-2"
-                            style={{
-                              borderBottom: isPlaying ? '2px solid #F0E040' : '1px solid #1C1C1C',
-                            }}
-                          >
-                            <div className="flex items-center gap-3">
-                              {/* Botón play */}
-                              <button
-                                className="flex items-center justify-center transition-colors"
-                                style={{
-                                  width:  '24px',
-                                  height: '24px',
-                                  borderRadius: '50%',
-                                  backgroundColor: isPlaying ? '#F0E040' : '#FFFFFF',
-                                }}
-                                onClick={() => handlePlayTrack(i)}
-                              >
-                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" style={{ marginLeft: '1px' }}>
-                                  <polygon points="5,3 19,12 5,21" fill="#000000" />
-                                </svg>
-                              </button>
-                              
-                              <span className="font-meta text-xs" style={{ color: '#FFFFFF' }}>
-                                {t.side}
-                              </span>
-                              <span className="font-display text-sm" style={{ color: isPlaying ? '#F0E040' : '#FFFFFF' }}>
-                                {t.track}
-                              </span>
-                            </div>
-                            
-                            <span className="font-meta text-xs" style={{ color: '#FFFFFF' }}>
-                              {t.duration}
-                            </span>
-                          </div>
-                        )
-                      })}
-                    </div>
+                    <TrackPlayers
+                      tracks={tracklist}
+                      artist={release.artists[0] ?? ''}
+                      releaseId={release.id}
+                    />
                   )}
 
                   {activeTab === 'notes' && release.comments && (
