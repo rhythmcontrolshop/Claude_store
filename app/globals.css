@@ -92,7 +92,7 @@ body {
 
 .marquee-content {
   display: inline-block;
-  animation: marquee 8s linear infinite;
+  animation: marquee 30s linear infinite;
 }
 
 .marquee:hover .marquee-content {

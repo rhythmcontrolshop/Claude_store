@@ -8,6 +8,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl
   const genre   = searchParams.get('genre')
   const style   = searchParams.get('style')
+  const label   = searchParams.get('label')
   const sort    = searchParams.get('sort') ?? 'newest'
   const page    = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10))
   const perPage = 24
@@ -24,6 +25,9 @@ export async function GET(request: NextRequest) {
   }
   if (style) {
     query = query.contains('styles', [style])
+  }
+  if (label) {
+    query = query.contains('labels', [label])
   }
 
   switch (sort) {

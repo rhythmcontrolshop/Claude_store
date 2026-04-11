@@ -1,154 +1,101 @@
 'use client'
 // components/layout/Navigation.tsx
-// Barra de navegación con menú hamburguesa en móvil.
+// Logo izquierda + menú inline. Mobile: logo centrado + menú debajo.
 
-import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 const NAV_LINKS = [
-  { href: '/',          label: 'Catálogo'   },
-  { href: '/events',    label: 'Eventos'    },
-  { href: '/labels',    label: 'Sellos'     },
-  { href: '/community', label: 'Comunidad'  },
+  { href: '/novedades', label: 'NOVEDADES' },
+  { href: '/',          label: 'CATÁLOGO'  },
+  { href: '/contacto',  label: 'CONTACTO'  },
 ]
 
 export default function Navigation() {
-  const [menuOpen, setMenuOpen] = useState(false)
-
   return (
-    <>
-      <header
-        className="fixed top-0 left-0 right-0 flex items-center justify-between px-4 md:px-6"
-        style={{
-          height:          'var(--rc-nav-height)',
-          backgroundColor: '#000000',
-          borderBottom:    '2px solid #FFFFFF',
-          zIndex:          100,
-        }}
-      >
-        {/* Hamburguesa - solo móvil */}
-        <button
-          className="md:hidden flex flex-col justify-center items-center"
-          style={{ width: '32px', height: '32px' }}
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Menú"
-        >
-          <span
-            style={{
-              display: 'block',
-              width:  '20px',
-              height: '2px',
-              backgroundColor: menuOpen ? '#F0E040' : '#FFFFFF',
-              transition: 'transform 0.2s, opacity 0.2s',
-              transform: menuOpen ? 'rotate(45deg) translate(4px, 4px)' : 'none',
-            }}
-          />
-          <span
-            style={{
-              display: 'block',
-              width:  '20px',
-              height: '2px',
-              backgroundColor: '#FFFFFF',
-              margin: '4px 0',
-              opacity: menuOpen ? 0 : 1,
-              transition: 'opacity 0.2s',
-            }}
-          />
-          <span
-            style={{
-              display: 'block',
-              width:  '20px',
-              height: '2px',
-              backgroundColor: menuOpen ? '#F0E040' : '#FFFFFF',
-              transition: 'transform 0.2s',
-              transform: menuOpen ? 'rotate(-45deg) translate(4px, -4px)' : 'none',
-            }}
-          />
-        </button>
+    <header style={{ backgroundColor: '#000000', borderBottom: '2px solid #FFFFFF' }}>
 
-        {/* Logo */}
-        <Link
-          href="/"
-          className="font-display text-sm md:text-base shrink-0"
-          style={{ color: '#FFFFFF' }}
-          onClick={() => setMenuOpen(false)}
-        >
-          RHYTHM CONTROL
+      {/* ── Desktop: logo + nav en una línea ── */}
+      <div
+        className="hidden md:flex items-center justify-between"
+        style={{ height: '80px', padding: '0 24px' }}
+      >
+        <Link href="/" style={{ display: 'flex', alignItems: 'center', height: '56px' }}>
+          <Image
+            src="/logo.svg"
+            alt="Rhythm Control"
+            width={280}
+            height={56}
+            style={{ objectFit: 'contain' }}
+            priority
+          />
         </Link>
 
-        {/* Links — solo desktop */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="flex items-center gap-8">
           {NAV_LINKS.map(({ href, label }) => (
             <Link
               key={href}
               href={href}
-              className="font-meta text-xs transition-colors hover:opacity-70"
+              className="font-display text-xs transition-opacity hover:opacity-60"
               style={{ color: '#FFFFFF' }}
             >
-              {label.toUpperCase()}
+              {label}
             </Link>
           ))}
+          <CartButton />
         </nav>
+      </div>
 
-        {/* Carrito */}
-        <button
-          className="font-meta text-xs transition-colors hover:opacity-70"
-          style={{ color: '#FFFFFF' }}
-          aria-label="Carrito de compra"
-        >
-          CARRITO (0)
-        </button>
-      </header>
-
-      {/* Overlay del menú móvil */}
-      {menuOpen && (
-        <div
-          className="fixed inset-0 md:hidden"
-          style={{
-            top:          'var(--rc-nav-height)',
-            backgroundColor: '#000000',
-            zIndex:       99,
-            borderLeft:   '2px solid #FFFFFF',
-            borderRight:  '2px solid #FFFFFF',
-            borderBottom: '2px solid #FFFFFF',
-          }}
-        >
-          <nav className="flex flex-col">
-            {NAV_LINKS.map(({ href, label }) => (
-              <Link
-                key={href}
-                href={href}
-                className="font-display text-lg px-6 py-5 transition-colors"
-                style={{
-                  color: '#FFFFFF',
-                  borderBottom: '1px solid #1C1C1C',
-                }}
-                onClick={() => setMenuOpen(false)}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#F0E040'
-                  e.currentTarget.style.color = '#000000'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent'
-                  e.currentTarget.style.color = '#FFFFFF'
-                }}
-              >
-                {label.toUpperCase()}
-              </Link>
-            ))}
-          </nav>
-
-          {/* Info adicional en menú móvil */}
-          <div className="p-6 mt-4" style={{ borderTop: '2px solid #FFFFFF' }}>
-            <p className="font-meta text-xs" style={{ color: '#FFFFFF' }}>
-              Tienda de discos en Barcelona
-            </p>
-            <p className="font-meta text-xs mt-2" style={{ color: '#F0E040' }}>
-              info@rhythmcontrol.es
-            </p>
-          </div>
+      {/* ── Mobile: logo centrado + menú debajo ── */}
+      <div className="md:hidden">
+        <div className="flex items-center justify-center" style={{ height: '60px' }}>
+          <Link href="/">
+            <Image
+              src="/logo.svg"
+              alt="Rhythm Control"
+              width={200}
+              height={44}
+              style={{ objectFit: 'contain' }}
+              priority
+            />
+          </Link>
         </div>
-      )}
-    </>
+
+        <nav
+          className="flex items-center justify-center gap-6"
+          style={{ borderTop: '1px solid #1C1C1C', padding: '10px 16px' }}
+        >
+          {NAV_LINKS.map(({ href, label }) => (
+            <Link
+              key={href}
+              href={href}
+              className="font-display text-xs"
+              style={{ color: '#FFFFFF' }}
+            >
+              {label}
+            </Link>
+          ))}
+          <CartButton />
+        </nav>
+      </div>
+
+    </header>
+  )
+}
+
+function CartButton() {
+  return (
+    <button
+      className="flex items-center gap-2 font-display text-xs transition-opacity hover:opacity-60"
+      style={{ color: '#FFFFFF' }}
+      aria-label="Carrito"
+    >
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+        <line x1="3" y1="6" x2="21" y2="6" />
+        <path d="M16 10a4 4 0 01-8 0" />
+      </svg>
+      CARRITO <span style={{ color: '#F0E040' }}>(0)</span>
+    </button>
   )
 }

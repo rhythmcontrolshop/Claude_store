@@ -44,8 +44,7 @@ export default async function Home() {
       <Navigation />
       <main
         style={{
-          paddingTop: 'var(--rc-nav-height)',
-          minHeight:  '100vh',
+          minHeight:       '100vh',
           backgroundColor: 'var(--rc-color-bg)',
         }}
       >

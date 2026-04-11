@@ -77,7 +77,8 @@ export interface Release {
   sleeve_condition: DiscogsCondition
   price: number
   currency: string
-  cover_image: string
+  cover_image:       string
+  back_cover_image?: string | null
   thumb: string
   // Extended data (Supabase)
   bpm?: number | null

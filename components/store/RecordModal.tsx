@@ -77,6 +77,7 @@ export default function RecordModal({ release, releases = [], onClose, onPlay, o
   const [activeTab, setActiveTab] = useState<TabType>(openTab || 'tracklist')
   const [playingTrack, setPlayingTrack] = useState<number | null>(null)
   const [previewUrls, setPreviewUrls] = useState<Record<number, string | null>>({})
+  const [showBack, setShowBack] = useState(false)
   
   const isAccentCondition = ACCENT_CONDITIONS.includes(release.condition)
   const tracklist = MOCK_TRACKLIST[release.title] || []
@@ -202,18 +203,32 @@ export default function RecordModal({ release, releases = [], onClose, onPlay, o
         </button>
 
         <div className="flex flex-col lg:flex-row">
-          <div className="relative shrink-0 w-full lg:w-[320px]" style={{ aspectRatio: '1' }}>
-            {release.cover_image ? (
+          <div className="relative shrink-0 w-full lg:w-[400px]" style={{ aspectRatio: '1', borderBottom: '2px solid #FFFFFF' }}>
+            {(showBack ? (release.back_cover_image ?? release.cover_image) : release.cover_image) ? (
               <Image
-                src={release.cover_image}
+                src={(showBack ? (release.back_cover_image ?? release.cover_image) : release.cover_image)!}
                 alt={`${release.artists[0]} — ${release.title}`}
                 fill
                 className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 320px"
+                sizes="(max-width: 1024px) 100vw, 400px"
                 unoptimized
               />
             ) : (
               <div className="w-full h-full" style={{ backgroundColor: '#0a0a0a' }} />
+            )}
+            {/* Toggle portada / dorso */}
+            {release.back_cover_image && (
+              <button
+                onClick={() => setShowBack(b => !b)}
+                className="absolute bottom-3 right-3 font-display text-xs px-3 py-1 hover:opacity-80"
+                style={{
+                  backgroundColor: 'rgba(0,0,0,0.8)',
+                  border:          '1px solid #FFFFFF',
+                  color:           showBack ? '#F0E040' : '#FFFFFF',
+                }}
+              >
+                {showBack ? 'PORTADA' : 'DORSO'}
+              </button>
             )}
           </div>
 
