@@ -14,7 +14,7 @@ export function FlyerPlaceholder({ title, date = '', code = 'RC-001' }: FlyerPla
   const W      = 300
   const H      = 450
   const PERIOD = 40   // px between stripe centers (horizontal spacing)
-  const LWIDTH = 22   // stroke width — slightly thicker than the gap
+  const LWIDTH = 20   // stroke width = PERIOD/2 → equal yellow and black
   const START  = -H   // start well off-screen left so top edge is always covered
   const COUNT  = Math.ceil((W + H * 2) / PERIOD) + 2
 
