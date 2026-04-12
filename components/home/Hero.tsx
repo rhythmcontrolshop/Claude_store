@@ -19,7 +19,7 @@ const BADGES = ['STAFF PICK', 'NEW!', 'ON HYPE', 'STAFF PICK', 'NEW!', 'ON HYPE'
 const MOCK_EVENTS = [
   {
     id:        'e1',
-    date:      'ABR 18',
+    date:      '2026-04-18',
     type:      'DJ SET',
     title:     'RHYTHM CONTROL × MOOG',
     venue:     'Moog Club, Barcelona',
@@ -29,7 +29,7 @@ const MOCK_EVENTS = [
   },
   {
     id:        'e2',
-    date:      'ABR 25',
+    date:      '2026-04-25',
     type:      'SESIÓN',
     title:     'DEEP FACTORY VOL.12',
     venue:     'Sala Apolo, Barcelona',
@@ -39,7 +39,7 @@ const MOCK_EVENTS = [
   },
   {
     id:        'e3',
-    date:      'MAY 03',
+    date:      '2026-05-03',
     type:      'ALL NIGHT',
     title:     'TECHNO MARATHON',
     venue:     'Nitsa Club, Barcelona',
@@ -220,47 +220,68 @@ function MixContent() {
 
 // ── EventsContent ──────────────────────────────────────────────────────────────
 
-function EventsContent({ onFlyer }: { onFlyer: (f: { url: string; title: string }) => void }) {
-  return (
-    <div
-      className="grid grid-cols-1 md:grid-cols-3"
-      style={{ minHeight: '220px' }}
-    >
-      {MOCK_EVENTS.map((event, i) => {
-        const marqueeText = `${event.title} — ${event.venue}`
-        const hasFlyer    = Boolean(event.flyer_url)
-        const hasWeb      = Boolean(event.web)
+const DIAS  = ['DOM','LUN','MAR','MIÉ','JUE','VIE','SÁB']
+const MESES = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE']
 
-        return (
+function formatEventDate(iso: string) {
+  const d   = new Date(iso + 'T12:00:00')
+  const dia = DIAS[d.getDay()]
+  const num = d.getDate()
+  const mes = MESES[d.getMonth()]
+  return `${dia} ${num} ${mes}`
+}
+
+function EventsContent({ onFlyer }: { onFlyer: (f: { url: string; title: string }) => void }) {
+  const n = MOCK_EVENTS.length
+  // Tailwind responsive span classes — strings must be complete for static analysis
+  const textDesktopClass  = n === 1 ? 'md:col-span-3' : n === 2 ? 'md:col-span-2' : 'md:col-span-1'
+  const imageDesktopClass = n === 1 ? 'md:col-span-3' : 'md:col-span-1'
+
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-6" style={{ minHeight: '220px' }}>
+      {MOCK_EVENTS.flatMap((event) => {
+        const hasFlyer = Boolean(event.flyer_url)
+        const hasWeb   = Boolean(event.web)
+
+        return [
+          /* ── Text column ── */
           <div
-            key={event.id}
-            style={{
-              display:       'flex',
-              flexDirection: 'column',
-              padding:       '20px',
-              borderRight:   i < MOCK_EVENTS.length - 1 ? '1px solid #1C1C1C' : 'none',
-              borderBottom:  '1px solid #1C1C1C',
-            }}
+            key={`${event.id}-text`}
+            className={`col-span-1 ${textDesktopClass} flex flex-col`}
+            style={{ borderLeft: '2px solid #FFFFFF', borderBottom: '1px solid #1C1C1C', padding: '16px' }}
           >
-            {/* Fecha + tipo */}
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', marginBottom: '8px', flexShrink: 0 }}>
-              <span className="font-display" style={{ color: '#F0E040', fontSize: '0.75rem' }}>{event.date}</span>
-              <span className="font-meta"    style={{ color: '#FFFFFF', fontSize: '0.55rem', opacity: 0.45 }}>{event.type}</span>
+            {/* Date + type */}
+            <div style={{ marginBottom: '6px', flexShrink: 0 }}>
+              <span className="font-display" style={{ color: '#F0E040', fontSize: '0.65rem', display: 'block' }}>
+                {formatEventDate(event.date)}
+              </span>
+              <span className="font-meta" style={{ color: '#FFFFFF', fontSize: '0.55rem', opacity: 0.45 }}>
+                {event.type}
+              </span>
             </div>
 
-            {/* Marquee título + venue */}
-            <Marquee text={marqueeText} style={{ color: '#FFFFFF', fontSize: '1.3rem', lineHeight: '1.2', flexShrink: 0 }} />
+            {/* Title */}
+            <Marquee
+              text={event.title}
+              style={{ color: '#FFFFFF', fontSize: '1.3rem', lineHeight: '1.2', flexShrink: 0, marginBottom: '4px' }}
+            />
 
-            {/* Lineup */}
+            {/* Venue */}
             <p
               className="font-meta"
-              style={{ color: '#FFFFFF', fontSize: '0.6rem', opacity: 0.5, marginTop: '6px', marginBottom: '16px', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+              style={{ color: '#FFFFFF', fontSize: '0.6rem', opacity: 0.5, marginBottom: '6px', flexShrink: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
             >
-              {event.lineup.join(' · ')}
+              {event.venue}
             </p>
 
-            {/* Botones */}
-            <div style={{ display: 'flex', gap: '8px', marginTop: 'auto', flexShrink: 0 }}>
+            {/* Lineup */}
+            <Marquee
+              text={event.lineup.join(' · ')}
+              style={{ color: '#FFFFFF', fontSize: '0.65rem', lineHeight: '1.4', opacity: 0.6, flexShrink: 0 }}
+            />
+
+            {/* Buttons */}
+            <div style={{ display: 'flex', gap: '8px', marginTop: 'auto', paddingTop: '12px', flexShrink: 0 }}>
               <button
                 className="font-display"
                 disabled={!hasFlyer}
@@ -297,8 +318,34 @@ function EventsContent({ onFlyer }: { onFlyer: (f: { url: string; title: string 
                 </span>
               )}
             </div>
-          </div>
-        )
+          </div>,
+
+          /* ── Flyer column ── */
+          <div
+            key={`${event.id}-img`}
+            className={`col-span-1 ${imageDesktopClass} relative overflow-hidden`}
+            style={{
+              minHeight:    '220px',
+              borderBottom: '1px solid #1C1C1C',
+              borderRight:  '1px solid #1C1C1C',
+              cursor:       hasFlyer ? 'pointer' : 'default',
+            }}
+            onClick={() => { if (hasFlyer && event.flyer_url) onFlyer({ url: event.flyer_url, title: event.title }) }}
+          >
+            {hasFlyer ? (
+              <Image
+                src={event.flyer_url!}
+                alt={`Flyer: ${event.title}`}
+                fill
+                style={{ objectFit: 'cover' }}
+                sizes="(max-width: 768px) 50vw, 300px"
+                unoptimized
+              />
+            ) : (
+              <div style={{ position: 'absolute', inset: 0, backgroundColor: '#0a0a0a' }} />
+            )}
+          </div>,
+        ]
       })}
     </div>
   )
