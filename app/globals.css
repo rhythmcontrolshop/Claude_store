@@ -98,7 +98,7 @@ body {
 
 .marquee-fast {
   display: inline-block;
-  animation: marquee 20s linear infinite;
+  animation: marquee 30s linear infinite;
 }
 
 @keyframes marquee {
