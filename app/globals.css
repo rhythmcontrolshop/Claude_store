@@ -93,7 +93,7 @@ body {
 /* Global marquee: always running (hero, etc.) */
 .marquee-content {
   display: inline-block;
-  animation: marquee 30s linear infinite;
+  animation: marquee 15s linear infinite;
 }
 
 .marquee-fast {
