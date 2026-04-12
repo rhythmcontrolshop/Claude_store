@@ -88,8 +88,11 @@ export interface Release {
   spotify_preview_url?: string | null
   youtube_id?: string | null
   bandcamp_album_id?: string | null
+  bandcamp_track_id?: string | null
   youtube_track_ids?: Record<string, string> | null
-  discogs_tracklist?: { position: string; title: string; duration?: string }[] | null
+  discogs_tracklist?: { position: string; title: string; duration?: string; type?: string | null }[] | null
+  discogs_notes?: string | null
+  artist_profile?: string | null
   comments?: string
   // Shopify
   shopify_product_id?: string | null
