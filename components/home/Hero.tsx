@@ -51,9 +51,7 @@ const MOCK_EVENTS = [
 
 const MIX = {
   date:      '2026-04-01',
-  // ⚠ Replace with a real mix slug: feed=%2Frhythmcontrolshop%2Fmix-name%2F
-  // Mixcloud widget needs a specific mix URL, not just the profile
-  embed:     'https://www.mixcloud.com/widget/iframe/?hide_cover=0&mini=0&autoplay=0&feed=%2Frhythmcontrolshop%2F',
+  embed:     'https://www.mixcloud.com/widget/iframe/?hide_cover=0&mini=0&autoplay=0&feed=%2Fmaxvibes%2Fthe-cat-walk-040426-totally-wired-radio%2F',
   dj:        'RC SELECTOR',
   origin:    'Barcelona',
   dj_image:  'https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=400&h=440&fit=crop',
