@@ -1,7 +1,6 @@
 'use client'
 // components/store/RecordCard.tsx
 
-import { useRef, useEffect, useState } from 'react'
 import Image from 'next/image'
 import type { Release, PlayerTrack } from '@/types'
 
@@ -11,24 +10,8 @@ interface RecordCardProps {
   onPlay:   (track: PlayerTrack, clipIndex: number) => void
 }
 
-function useTextOverflows(text: string) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const spanRef      = useRef<HTMLSpanElement>(null)
-  const [overflows, setOverflows] = useState(false)
-
-  useEffect(() => {
-    if (containerRef.current && spanRef.current) {
-      setOverflows(spanRef.current.offsetWidth > containerRef.current.offsetWidth)
-    }
-  }, [text])
-
-  return { containerRef, spanRef, overflows }
-}
-
 export default function RecordCard({ release, onSelect }: RecordCardProps) {
   const artist = release.artists[0] ?? '—'
-  const { containerRef: aRef, spanRef: aSpan, overflows: aOver } = useTextOverflows(artist)
-  const { containerRef: tRef, spanRef: tSpan, overflows: tOver } = useTextOverflows(release.title)
 
   return (
     <article
@@ -54,19 +37,15 @@ export default function RecordCard({ release, onSelect }: RecordCardProps) {
           className="absolute bottom-0 left-0 right-0 px-3 pt-10 pb-3"
           style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.95) 70%, transparent)' }}
         >
-          {/* Artist row — mide con span oculto */}
-          <div ref={aRef} style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>
-            <span ref={aSpan} className="font-display" style={{ visibility: 'hidden', position: 'absolute', whiteSpace: 'nowrap', fontSize: '1.3rem' }}>{artist}</span>
-            <p className={`font-display ${aOver ? 'marquee-fast' : ''}`} style={{ color: '#FFFFFF', fontSize: '1.3rem', lineHeight: '1.1' }}>
-              {aOver ? `${artist} · ${artist} ` : artist}
-            </p>
+          <div className="marquee">
+            <span className="marquee-fast font-display" style={{ color: '#FFFFFF', fontSize: '1.3rem', lineHeight: '1.1', whiteSpace: 'nowrap' }}>
+              {artist}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{artist}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </span>
           </div>
-          {/* Title row */}
-          <div ref={tRef} style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>
-            <span ref={tSpan} className="font-display" style={{ visibility: 'hidden', position: 'absolute', whiteSpace: 'nowrap', fontSize: '1.3rem' }}>{release.title}</span>
-            <p className={`font-display ${tOver ? 'marquee-fast' : ''}`} style={{ color: '#F0E040', fontSize: '1.3rem', lineHeight: '1.1' }}>
-              {tOver ? `${release.title} · ${release.title} ` : release.title}
-            </p>
+          <div className="marquee">
+            <span className="marquee-fast font-display" style={{ color: '#F0E040', fontSize: '1.3rem', lineHeight: '1.1', whiteSpace: 'nowrap' }}>
+              {release.title}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{release.title}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </span>
           </div>
         </div>
       </div>
@@ -79,15 +58,15 @@ export default function RecordCard({ release, onSelect }: RecordCardProps) {
         <div className="absolute top-0 left-0 bottom-0" style={{ width: '2px', backgroundColor: '#FFFFFF' }} />
 
         <div style={{ marginLeft: '6px' }}>
-          <div style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>
-            <p className={`font-display ${aOver ? 'marquee-fast' : ''}`} style={{ color: '#FFFFFF', fontSize: '1.3rem', lineHeight: '1.1' }}>
-              {aOver ? `${artist} · ${artist} ` : artist}
-            </p>
+          <div className="marquee">
+            <span className="marquee-fast font-display" style={{ color: '#FFFFFF', fontSize: '1.3rem', lineHeight: '1.1', whiteSpace: 'nowrap' }}>
+              {artist}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{artist}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </span>
           </div>
-          <div style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>
-            <p className={`font-display ${tOver ? 'marquee-fast' : ''}`} style={{ color: '#F0E040', fontSize: '1.3rem', lineHeight: '1.1' }}>
-              {tOver ? `${release.title} · ${release.title} ` : release.title}
-            </p>
+          <div className="marquee">
+            <span className="marquee-fast font-display" style={{ color: '#F0E040', fontSize: '1.3rem', lineHeight: '1.1', whiteSpace: 'nowrap' }}>
+              {release.title}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{release.title}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </span>
           </div>
           <p className="font-display text-sm font-bold mt-1" style={{ color: '#FFFFFF' }}>{release.labels[0] ?? ''}</p>
           <p className="font-meta text-xs mt-1" style={{ color: '#FFFFFF' }}>{[release.year, release.format].filter(Boolean).join(' · ')}</p>
