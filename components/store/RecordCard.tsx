@@ -1,6 +1,5 @@
 'use client'
 // components/store/RecordCard.tsx
-// Card individual de un disco.
 
 import { useRef, useEffect, useState } from 'react'
 import Image from 'next/image'
@@ -12,20 +11,21 @@ interface RecordCardProps {
   onPlay:   (track: PlayerTrack, clipIndex: number) => void
 }
 
-export default function RecordCard({ release, onSelect, onPlay }: RecordCardProps) {
-  const artistRef = useRef<HTMLDivElement>(null)
-  const titleRef  = useRef<HTMLDivElement>(null)
-  const [artistNeedsScroll, setArtistNeedsScroll] = useState(false)
-  const [titleNeedsScroll, setTitleNeedsScroll]  = useState(false)
-
+function useNeedsScroll(text: string) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [needs, setNeeds] = useState(false)
   useEffect(() => {
-    if (artistRef.current) {
-      setArtistNeedsScroll(artistRef.current.scrollWidth > artistRef.current.clientWidth)
-    }
-    if (titleRef.current) {
-      setTitleNeedsScroll(titleRef.current.scrollWidth > titleRef.current.clientWidth)
-    }
-  }, [release.artists, release.title])
+    if (ref.current) setNeeds(ref.current.scrollWidth > ref.current.clientWidth + 1)
+  }, [text])
+  return [ref, needs] as const
+}
+
+export default function RecordCard({ release, onSelect }: RecordCardProps) {
+  const artist = release.artists[0] ?? '—'
+  const [artistRef,  artistNeeds]  = useNeedsScroll(artist)
+  const [titleRef,   titleNeeds]   = useNeedsScroll(release.title)
+  const [artistHRef, artistHNeeds] = useNeedsScroll(artist)
+  const [titleHRef,  titleHNeeds]  = useNeedsScroll(release.title)
 
   return (
     <article
@@ -33,12 +33,12 @@ export default function RecordCard({ release, onSelect, onPlay }: RecordCardProp
       style={{ aspectRatio: '1' }}
       onClick={() => onSelect(release)}
     >
-      {/* Estado por defecto: Imagen + Info */}
+      {/* Default: imagen + gradiente */}
       <div className="absolute inset-0 transition-opacity duration-[250ms] group-hover:opacity-0">
         {release.cover_image ? (
           <Image
             src={release.cover_image}
-            alt={`${release.artists[0]} — ${release.title}`}
+            alt={`${artist} — ${release.title}`}
             fill
             className="object-cover"
             sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 16vw"
@@ -52,27 +52,26 @@ export default function RecordCard({ release, onSelect, onPlay }: RecordCardProp
           className="absolute bottom-0 left-0 right-0 px-3 pt-10 pb-3"
           style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.95) 70%, transparent)' }}
         >
-          <div ref={artistRef} className="marquee" style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>
+          <div ref={artistRef} className="marquee">
             <p
-              className={`font-display ${artistNeedsScroll ? 'marquee-content' : ''}`}
+              className={`font-display ${artistNeeds ? 'marquee-card' : ''}`}
               style={{ color: '#FFFFFF', fontSize: '1.3rem', lineHeight: '1.1' }}
             >
-              {artistNeedsScroll ? `${release.artists[0] ?? '—'} · ${release.artists[0] ?? '—'} ` : (release.artists[0] ?? '—')}
+              {artistNeeds ? `${artist} · ${artist} ` : artist}
             </p>
           </div>
-
-          <div ref={titleRef} className="marquee" style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>
+          <div ref={titleRef} className="marquee">
             <p
-              className={`font-display ${titleNeedsScroll ? 'marquee-content' : ''}`}
+              className={`font-display ${titleNeeds ? 'marquee-card' : ''}`}
               style={{ color: '#F0E040', fontSize: '1.3rem', lineHeight: '1.1' }}
             >
-              {titleNeedsScroll ? `${release.title} · ${release.title} ` : release.title}
+              {titleNeeds ? `${release.title} · ${release.title} ` : release.title}
             </p>
           </div>
         </div>
       </div>
 
-      {/* Estado hover: Info completa */}
+      {/* Hover: info completa */}
       <div
         className="absolute inset-0 flex flex-col justify-between p-4 opacity-0 transition-opacity duration-[250ms] group-hover:opacity-100"
         style={{ backgroundColor: '#000000' }}
@@ -82,56 +81,47 @@ export default function RecordCard({ release, onSelect, onPlay }: RecordCardProp
           style={{ width: '2px', backgroundColor: '#FFFFFF' }}
         />
 
-        {/* Info arriba */}
         <div style={{ marginLeft: '6px' }}>
-          <p className="font-display" style={{ color: '#FFFFFF', fontSize: '1.3rem', lineHeight: '1.1' }}>
-            {release.artists[0] ?? '—'}
-          </p>
-
-          <p className="font-display" style={{ color: '#F0E040', fontSize: '1.3rem', lineHeight: '1.1' }}>
-            {release.title}
-          </p>
-
+          <div ref={artistHRef} className="marquee">
+            <p
+              className={`font-display ${artistHNeeds ? 'marquee-card' : ''}`}
+              style={{ color: '#FFFFFF', fontSize: '1.3rem', lineHeight: '1.1' }}
+            >
+              {artistHNeeds ? `${artist} · ${artist} ` : artist}
+            </p>
+          </div>
+          <div ref={titleHRef} className="marquee">
+            <p
+              className={`font-display ${titleHNeeds ? 'marquee-card' : ''}`}
+              style={{ color: '#F0E040', fontSize: '1.3rem', lineHeight: '1.1' }}
+            >
+              {titleHNeeds ? `${release.title} · ${release.title} ` : release.title}
+            </p>
+          </div>
           <p className="font-display text-sm font-bold mt-1" style={{ color: '#FFFFFF' }}>
             {release.labels[0] ?? ''}
           </p>
-
           <p className="font-meta text-xs mt-1" style={{ color: '#FFFFFF' }}>
             {[release.year, release.format].filter(Boolean).join(' · ')}
           </p>
         </div>
 
-        {/* Botones abajo */}
         <div className="flex gap-2" style={{ marginLeft: '6px' }}>
           <button
             className="font-display text-xs px-4 py-2 transition-colors"
             style={{ backgroundColor: '#F0E040', color: '#000000' }}
-            onClick={(e) => {
-              e.stopPropagation()
-              onSelect(release)
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#FFFFFF'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#F0E040'
-            }}
+            onClick={e => { e.stopPropagation(); onSelect(release) }}
+            onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#FFFFFF' }}
+            onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#F0E040' }}
           >
             ESCUCHAR
           </button>
-
           <button
             className="flex-1 flex items-center justify-center gap-2 font-display text-xs px-3 py-2 transition-colors"
             style={{ border: '2px solid #FFFFFF', color: '#FFFFFF', backgroundColor: 'transparent' }}
-            onClick={(e) => e.stopPropagation()}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#FFFFFF'
-              e.currentTarget.style.color = '#000000'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent'
-              e.currentTarget.style.color = '#FFFFFF'
-            }}
+            onClick={e => e.stopPropagation()}
+            onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#FFFFFF'; e.currentTarget.style.color = '#000000' }}
+            onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#FFFFFF' }}
           >
             <span style={{ fontWeight: 700 }}>
               {release.price.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}
