@@ -157,3 +157,26 @@ export async function getReleaseDetail(
 ): Promise<DiscogsAPIRelease> {
   return request<DiscogsAPIRelease>(`/releases/${releaseId}`)
 }
+
+export interface DiscogsAPIImage {
+  uri: string
+  resource_url: string
+  type: 'primary' | 'secondary'
+  width?: number
+  height?: number
+}
+
+export interface DiscogsAPIArtistDetail {
+  id: number
+  name: string
+  profile?: string
+  urls?: string[]
+  images?: DiscogsAPIImage[]
+}
+
+export async function getArtistDetail(
+  artistId: number
+): Promise<DiscogsAPIArtistDetail> {
+  return request<DiscogsAPIArtistDetail>(`/artists/${artistId}`)
+}
+
