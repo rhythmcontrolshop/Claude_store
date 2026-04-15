@@ -3,12 +3,12 @@ import LogoutButton from '@/components/admin/LogoutButton'
 const NAV_LINKS = [
   { href: '/admin',              label: 'Dashboard'  },
   { href: '/admin/inventory',    label: 'Inventario' },
+  { href: '/admin/codigos',      label: 'Códigos'    },
   { href: '/admin/pricing',      label: 'Precios'    },
   { href: '/admin/shipping',     label: 'Envíos'     },
-  { href: '/admin/reservations', label: 'Reservas'   },
-  { href: '/admin/scan',         label: 'Escanear'   },
-  { href: '/admin/events',       label: 'Eventos'    },
-  { href: '/admin/orders',       label: 'Pedidos'    },
+  { href: '/admin/pedidos',      label: 'Pedidos'    },
+  { href: '/admin/guardi',       label: 'Guardi'     },
+  { href: '/admin/agenda',       label: 'Agenda'     },
 ]
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (

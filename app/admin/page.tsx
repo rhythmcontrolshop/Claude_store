@@ -28,7 +28,7 @@ export default async function AdminDashboard() {
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           <StatCard label="En venta"   value={active}   accent />
           <StatCard label="Vendidos"   value={sold}   />
-          <StatCard label="Reservados" value={reserved} />
+          <StatCard label="Guardi" value={reserved} />
         </div>
       </section>
 
@@ -51,9 +51,10 @@ export default async function AdminDashboard() {
         <p className="text-xs font-medium mb-4" style={{ color: '#000000' }}>ACCIONES RÁPIDAS</p>
         <div className="flex flex-col sm:flex-row gap-3">
           <QuickLink href="/admin/inventory" label="VER INVENTARIO" />
-          <QuickLink href="/admin/reservations" label="GESTIONAR RESERVAS" />
-          <QuickLink href="/admin/scan" label="ESCANEAR DISCO" />
-          <QuickLink href="/admin/events" label="GESTIONAR AGENDA" />
+          <QuickLink href="/admin/guardi" label="GUARDI" />
+          <QuickLink href="/admin/codigos" label="CODIGOS" />
+          <QuickLink href="/admin/pedidos" label="PEDIDOS" />
+          <QuickLink href="/admin/agenda" label="AGENDA" />
           <QuickLink href="/" label="VER TIENDA →" external />
         </div>
       </section>
