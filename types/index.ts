@@ -99,7 +99,6 @@ export interface Release {
   shopify_variant_id?: string | null
   // Status
   quantity?: number
-  quantity?: number
   status: 'active' | 'sold' | 'reserved' | 'hidden'
   created_at: string
   updated_at: string
