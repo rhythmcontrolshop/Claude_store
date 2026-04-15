@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic'
 import Navigation    from '@/components/layout/Navigation'
 import Hero          from '@/components/home/Hero'
 import CatalogueView from '@/components/store/CatalogueView'
