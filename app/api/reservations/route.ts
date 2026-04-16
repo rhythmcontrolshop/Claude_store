@@ -35,7 +35,7 @@ export async function POST(request: Request) {
 
   const parsed = ReservationSchema.safeParse(raw)
   if (!parsed.success) {
-    const message = parsed.error.errors[0]?.message ?? 'Datos inválidos'
+    const message = parsed.error.issues[0]?.message ?? 'Datos inválidos'
     return Response.json({ error: message }, { status: 400 })
   }
 
