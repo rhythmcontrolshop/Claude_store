@@ -16,7 +16,7 @@ const securityHeaders = [
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://i.discogs.com https://*.discogs.com https://img.discogs.com https://images.unsplash.com",
+      "img-src 'self' data: blob: https://i.discogs.com https://*.discogs.com https://img.discogs.com https://images.unsplash.com https://picsum.photos https://*.picsum.photos",
       "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://www.googleapis.com https://api.discogs.com",
       "frame-src https://js.stripe.com https://www.youtube.com https://www.youtube-nocookie.com",
       "font-src 'self'",
