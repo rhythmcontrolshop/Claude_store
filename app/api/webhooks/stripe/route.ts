@@ -130,68 +130,6 @@ export async function POST(request: Request) {
       break
     }
 
-    // ── Suscripciones ─────────────────────────────────────────
-    case 'customer.subscription.created':
-    case 'customer.subscription.updated': {
-      const sub = event.data.object as Stripe.Subscription
-      const { data: customer } = await supabase
-        .from('stripe_customers')
-        .select('user_id')
-        .eq('stripe_customer_id', sub.customer as string)
-        .single()
-
-      if (!customer) break
-
-      const item = sub.items.data[0]
-      await supabase.from('subscriptions').upsert({
-        user_id: customer.user_id,
-        stripe_subscription_id: sub.id,
-        stripe_customer_id: sub.customer as string,
-        status: sub.status,
-        price_id: item.price.id,
-        current_period_start: new Date(item.current_period_start * 1000).toISOString(),
-        current_period_end: new Date(item.current_period_end * 1000).toISOString(),
-        cancel_at_period_end: sub.cancel_at_period_end,
-        canceled_at: sub.canceled_at ? new Date(sub.canceled_at * 1000).toISOString() : null,
-      }, { onConflict: 'stripe_subscription_id' })
-      break
-    }
-
-    case 'customer.subscription.deleted': {
-      const sub = event.data.object as Stripe.Subscription
-      await supabase
-        .from('subscriptions')
-        .update({ status: 'canceled', canceled_at: new Date().toISOString() })
-        .eq('stripe_subscription_id', sub.id)
-      break
-    }
-
-    case 'invoice.paid': {
-      const invoice = event.data.object as Stripe.Invoice
-      if (!invoice.subscription) break
-      const periodEnd = invoice.lines.data[0]?.period?.end
-      await supabase
-        .from('subscriptions')
-        .update({
-          status: 'active',
-          ...(periodEnd && {
-            current_period_end: new Date(periodEnd * 1000).toISOString(),
-          }),
-        })
-        .eq('stripe_subscription_id', invoice.subscription as string)
-      break
-    }
-
-    case 'invoice.payment_failed': {
-      const invoice = event.data.object as Stripe.Invoice
-      if (!invoice.subscription) break
-      await supabase
-        .from('subscriptions')
-        .update({ status: 'past_due' })
-        .eq('stripe_subscription_id', invoice.subscription as string)
-      break
-    }
-
     case 'charge.refunded': {
       const charge = event.data.object as Stripe.Charge
       if (!charge.payment_intent) break
