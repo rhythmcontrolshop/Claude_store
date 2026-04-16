@@ -53,7 +53,7 @@ export async function createCheckoutSession({
     const onlineChannel = channels.find(c => c.slug === channel)
     const coefficient = onlineChannel?.coefficient ?? 1.05
 
-    const lineItems = items.map(item => {
+    const lineItems: any[] = items.map(item => {
       const channelPrice = calculateChannelPrice(item.price, coefficient)
       return {
         price_data: {
@@ -82,8 +82,6 @@ export async function createCheckoutSession({
           product_data: {
             name: `Envío: ${shippingRate.name}`,
             ...(shippingRate.description ? { description: shippingRate.description } : {}),
-            images: [],
-            metadata: {},
           },
           unit_amount: Math.round(shippingRate.price * 100),
           tax_behavior: 'inclusive' as const,
