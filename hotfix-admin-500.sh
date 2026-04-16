@@ -1,3 +1,10 @@
+#!/bin/bash
+set -e
+PROJECT="${1:-.}"
+echo "=== HOTFIX: Admin 500 Error ==="
+
+mkdir -p "$PROJECT/lib/supabase"
+cat > "$PROJECT/lib/supabase/middleware.ts" << 'ENDOFFILE'
 // lib/supabase/middleware.ts
 import { createServerClient }            from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
@@ -68,3 +75,7 @@ function redirectToLogin(request: NextRequest, error?: string): NextResponse {
   url.search   = error ? `?error=${error}` : ''
   return NextResponse.redirect(url)
 }
+ENDOFFILE
+echo "✓ lib/supabase/middleware.ts"
+echo ""
+echo "=== HOTFIX aplicado ==="
