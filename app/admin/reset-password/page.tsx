@@ -1,12 +1,13 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 export default function AdminResetPassword() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const supabaseRef = useRef<SupabaseClient | null>(null)
   const [ready, setReady] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -16,40 +17,49 @@ export default function AdminResetPassword() {
     const supabase = createClient()
     supabaseRef.current = supabase
 
-    // @supabase/ssr no procesa el hash automáticamente — hay que hacerlo a mano
-    const hash = window.location.hash.substring(1)
-    const params = new URLSearchParams(hash)
-    const accessToken  = params.get('access_token')
-    const refreshToken = params.get('refresh_token')
-    const type         = params.get('type')
+    async function bootstrap() {
+      // PKCE flow: Supabase envía ?code=xxx en la query string
+      const code = searchParams.get('code')
+      if (code) {
+        const { error } = await supabase.auth.exchangeCodeForSession(code)
+        if (error) {
+          setError('Enlace inválido o expirado.')
+        } else {
+          setReady(true)
+          // Limpiar el code de la URL sin recargar
+          window.history.replaceState(null, '', window.location.pathname)
+        }
+        return
+      }
 
-    if (type === 'recovery' && accessToken && refreshToken) {
-      supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken })
-        .then(({ error }) => {
-          if (error) {
-            setError('Enlace inválido o expirado.')
-          } else {
-            setReady(true)
-            // Limpiar el hash de la URL sin recargar
-            window.history.replaceState(null, '', window.location.pathname)
-          }
-        })
-    } else {
-      // Fallback: escuchar el evento por si el cliente lo procesa solo
+      // Implicit flow (legacy): tokens en el hash #access_token=xxx
+      const hash = window.location.hash.substring(1)
+      const params = new URLSearchParams(hash)
+      const accessToken  = params.get('access_token')
+      const refreshToken = params.get('refresh_token')
+      const type         = params.get('type')
+
+      if (type === 'recovery' && accessToken && refreshToken) {
+        const { error } = await supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken })
+        if (error) {
+          setError('Enlace inválido o expirado.')
+        } else {
+          setReady(true)
+          window.history.replaceState(null, '', window.location.pathname)
+        }
+        return
+      }
+
+      // Fallback: escuchar evento PASSWORD_RECOVERY
       const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
         if (event === 'PASSWORD_RECOVERY') setReady(true)
       })
-
-      const timeout = setTimeout(() => {
-        setError('Enlace inválido o expirado.')
-      }, 6000)
-
-      return () => {
-        subscription.unsubscribe()
-        clearTimeout(timeout)
-      }
+      const timeout = setTimeout(() => setError('Enlace inválido o expirado.'), 6000)
+      return () => { subscription.unsubscribe(); clearTimeout(timeout) }
     }
-  }, [])
+
+    bootstrap()
+  }, [searchParams])
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
