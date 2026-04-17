@@ -11,22 +11,32 @@ export default function AdminResetPassword() {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    const hash = window.location.hash
-    const params = new URLSearchParams(hash.replace('#', ''))
-    const accessToken  = params.get('access_token')
-    const refreshToken = params.get('refresh_token')
-
-    if (!accessToken || !refreshToken) {
-      setError('Enlace inválido o expirado.')
-      return
-    }
-
     const supabase = createClient()
-    supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken })
-      .then(({ error }) => {
-        if (error) setError('El enlace ha expirado. Solicita uno nuevo.')
-        else setReady(true)
+
+    // Supabase processes the hash automatically and fires PASSWORD_RECOVERY
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setReady(true)
+      }
+    })
+
+    // Fallback: if session already exists (token was auto-processed before mount)
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) setReady(true)
+    })
+
+    // Timeout: if no event after 8s, the link is invalid/expired
+    const timeout = setTimeout(() => {
+      setReady(prev => {
+        if (!prev) setError('Enlace inválido o expirado.')
+        return prev
       })
+    }, 8000)
+
+    return () => {
+      subscription.unsubscribe()
+      clearTimeout(timeout)
+    }
   }, [])
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -45,11 +55,12 @@ export default function AdminResetPassword() {
     const supabase = createClient()
     const { error } = await supabase.auth.updateUser({ password })
     if (error) {
-      setError('Error al actualizar. Solicita un nuevo enlace.')
+      setError('Error al actualizar: ' + error.message)
       setLoading(false)
       return
     }
 
+    await supabase.auth.signOut()
     router.replace('/admin/login')
   }
 
