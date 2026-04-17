@@ -159,7 +159,7 @@ export default function RecordModal({ release, releases = [], onClose, onPlay, o
                   className="flex-1 font-display text-sm transition-colors hover:opacity-80 flex items-center justify-center gap-2"
                   style={{ backgroundColor: '#FFFFFF', color: '#000000', minHeight: '44px' }}
                   onClick={handleAddToCart}>
-                  {t('btn.addToCart')}
+                  AÑADIR
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
                     <line x1="3" y1="6" x2="21" y2="6" />
@@ -169,7 +169,7 @@ export default function RecordModal({ release, releases = [], onClose, onPlay, o
                   className="font-display text-sm px-4 transition-colors hover:opacity-80"
                   style={{ border: '2px solid #F0E040', color: '#F0E040', backgroundColor: 'transparent', minHeight: '44px' }}
                   onClick={() => setShowReserve(true)}>
-                  {t('btn.pickup')}
+                  GUARDI
                 </button>
                 <FavoriteButton releaseId={release.id} discogsReleaseId={release.discogs_release_id} variant="modal" />
               </div>

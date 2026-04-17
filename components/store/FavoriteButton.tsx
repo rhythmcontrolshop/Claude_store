@@ -136,7 +136,6 @@ export default function FavoriteButton({
       aria-label={favorited ? t('btn.inFavorites') : t('btn.favorite')}
     >
       {heartSvg}
-      {favorited ? t('btn.inFavorites') : t('btn.favorite')}
     </button>
   )
 }
