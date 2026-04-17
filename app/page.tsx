@@ -1,10 +1,11 @@
-import Navigation    from '@/components/layout/Navigation'
-import Hero          from '@/components/home/Hero'
-import CatalogueView from '@/components/store/CatalogueView'
-import StrobeDots    from '@/components/ui/StrobeDots'
-import Footer        from '@/components/layout/Footer'
-import { createClient } from '@/lib/supabase/server'
-import type { Release } from '@/types'
+import Navigation        from '@/components/layout/Navigation'
+import Hero              from '@/components/home/Hero'
+import CatalogueView     from '@/components/store/CatalogueView'
+import StrobeDots        from '@/components/ui/StrobeDots'
+import Footer            from '@/components/layout/Footer'
+import AuthHashRedirect  from '@/components/auth/AuthHashRedirect'
+import { createClient }  from '@/lib/supabase/server'
+import type { Release }  from '@/types'
 
 async function getInitialData(): Promise<{ releases: Release[]; total: number; genres: string[] }> {
   try {
@@ -22,6 +23,7 @@ export default async function Home() {
 
   return (
     <>
+      <AuthHashRedirect />
       <Navigation />
       <main style={{ minHeight: '100vh', backgroundColor: '#000000' }}>
 

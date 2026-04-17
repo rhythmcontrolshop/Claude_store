@@ -1,64 +1,118 @@
-// app/admin/reset-password/page.tsx
-import { resetPassword } from './actions'
-import PasswordInput from '@/components/ui/PasswordInput'
+'use client'
 
-export default async function AdminResetPassword({
-  searchParams,
-}: {
-  searchParams: Promise<{ error?: string }>
-}) {
-  const { error } = await searchParams
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
+
+export default function AdminResetPassword() {
+  const router = useRouter()
+  const [ready, setReady] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    const hash = window.location.hash
+    const params = new URLSearchParams(hash.replace('#', ''))
+    const accessToken  = params.get('access_token')
+    const refreshToken = params.get('refresh_token')
+
+    if (!accessToken || !refreshToken) {
+      setError('Enlace inválido o expirado.')
+      return
+    }
+
+    const supabase = createClient()
+    supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken })
+      .then(({ error }) => {
+        if (error) setError('El enlace ha expirado. Solicita uno nuevo.')
+        else setReady(true)
+      })
+  }, [])
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setError(null)
+    const form = e.currentTarget
+    const password        = (form.elements.namedItem('password')        as HTMLInputElement).value
+    const confirmPassword = (form.elements.namedItem('confirmPassword') as HTMLInputElement).value
+
+    if (password !== confirmPassword) {
+      setError('Las contraseñas no coinciden.')
+      return
+    }
+
+    setLoading(true)
+    const supabase = createClient()
+    const { error } = await supabase.auth.updateUser({ password })
+    if (error) {
+      setError('Error al actualizar. Solicita un nuevo enlace.')
+      setLoading(false)
+      return
+    }
+
+    router.replace('/admin/login')
+  }
 
   return (
-    <main
-      className="min-h-screen flex items-center justify-center px-4"
-      style={{ backgroundColor: '#FFFFFF' }}
-    >
+    <main className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: '#FFFFFF' }}>
       <div className="w-full max-w-xs">
 
         <div className="text-center mb-10">
-          <h1 className="text-2xl font-bold" style={{ color: '#000000' }}>
-            RHYTHM CONTROL
-          </h1>
-          <p className="text-xs mt-2" style={{ color: '#6b7280' }}>
-            NUEVA CONTRASEÑA
-          </p>
+          <h1 className="text-2xl font-bold" style={{ color: '#000000' }}>RHYTHM CONTROL</h1>
+          <p className="text-xs mt-2" style={{ color: '#6b7280' }}>NUEVA CONTRASEÑA</p>
         </div>
 
         <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', marginBottom: '2rem' }} />
 
-        <form action={resetPassword} className="flex flex-col gap-5">
-          <PasswordInput
-            id="password"
-            name="password"
-            label="NUEVA CONTRASEÑA"
-            placeholder="Mínimo 6 caracteres"
-            minLength={6}
-          />
+        {error ? (
+          <div className="text-center">
+            <p className="text-xs mb-6" style={{ color: '#ef4444' }}>{error}</p>
+            <a href="/admin/recover" className="text-xs underline" style={{ color: '#6b7280' }}>
+              Solicitar nuevo enlace
+            </a>
+          </div>
+        ) : !ready ? (
+          <p className="text-xs text-center" style={{ color: '#6b7280' }}>Verificando enlace…</p>
+        ) : (
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            <div>
+              <label htmlFor="password" className="text-xs block mb-2" style={{ color: '#374151' }}>NUEVA CONTRASEÑA</label>
+              <input
+                id="password" name="password" type="password"
+                required minLength={6} autoFocus
+                placeholder="Mínimo 6 caracteres"
+                className="w-full text-sm px-4 py-3 focus:outline-none"
+                style={{ border: '1px solid #d1d5db', color: '#000000' }}
+              />
+            </div>
+            <div>
+              <label htmlFor="confirmPassword" className="text-xs block mb-2" style={{ color: '#374151' }}>CONFIRMAR CONTRASEÑA</label>
+              <input
+                id="confirmPassword" name="confirmPassword" type="password"
+                required minLength={6}
+                placeholder="Repite la contraseña"
+                className="w-full text-sm px-4 py-3 focus:outline-none"
+                style={{ border: '1px solid #d1d5db', color: '#000000' }}
+              />
+            </div>
 
-          <PasswordInput
-            id="confirmPassword"
-            name="confirmPassword"
-            label="CONFIRMAR CONTRASEÑA"
-            placeholder="Repite la contraseña"
-            minLength={6}
-            autoComplete="new-password"
-          />
+            {error && <p className="text-xs" style={{ color: '#ef4444' }}>{error}</p>}
 
-          {error && (
-            <p className="text-xs" style={{ color: '#ef4444' }}>
-              {error === 'mismatch' ? 'Las contraseñas no coinciden' : 'Error al actualizar. El enlace puede haber expirado.'}
-            </p>
-          )}
+            <button
+              type="submit" disabled={loading}
+              className="w-full text-sm py-3 transition-colors hover:opacity-90 disabled:opacity-50"
+              style={{ backgroundColor: '#000000', color: '#FFFFFF' }}
+            >
+              {loading ? 'GUARDANDO…' : 'GUARDAR NUEVA CONTRASEÑA'}
+            </button>
+          </form>
+        )}
 
-          <button
-            type="submit"
-            className="w-full text-sm py-3 transition-colors hover:opacity-90"
-            style={{ backgroundColor: '#000000', color: '#FFFFFF' }}
-          >
-            GUARDAR NUEVA CONTRASEÑA
-          </button>
-        </form>
+        <div className="mt-6 text-center">
+          <a href="/admin/login" className="text-xs underline hover:opacity-60" style={{ color: '#6b7280' }}>
+            ← Volver al login
+          </a>
+        </div>
       </div>
     </main>
   )
