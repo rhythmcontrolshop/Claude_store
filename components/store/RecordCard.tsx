@@ -34,7 +34,7 @@ export default function RecordCard({ release, onSelect, theme = 'default', isNew
         <div className="absolute inset-0 md:transition-opacity md:duration-[250ms] md:group-hover:opacity-0">
           {release.cover_image
             ? <Image src={release.cover_image} alt={`${artist} — ${release.title}`}
-                fill className="object-cover" sizes="(max-width: 768px) 50vw, 16vw" />
+                fill className="object-cover" sizes="(max-width: 768px) 50vw, 16vw" unoptimized />
             : <div className="w-full h-full" style={{ backgroundColor: '#0a0a0a' }} />}
           {!isAvailable && (
             <div className="absolute inset-0 flex items-center justify-center"

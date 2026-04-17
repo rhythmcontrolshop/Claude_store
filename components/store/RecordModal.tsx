@@ -114,12 +114,12 @@ export default function RecordModal({ release, releases = [], onClose, onPlay, o
           <div className="flex flex-row md:flex-col shrink-0 w-full md:w-[300px] md:border-r-2 md:border-b-0 border-b-2 border-white">
             <div className="relative w-1/2 md:w-full" style={{ aspectRatio: '1' }}>
               {release.cover_image
-                ? <Image src={release.cover_image} alt={`${release.title} Front`} fill style={{ objectFit: 'cover' }} sizes="(max-width: 768px) 50vw, 300px" />
+                ? <Image src={release.cover_image} alt={`${release.title} Front`} fill style={{ objectFit: 'cover' }} sizes="(max-width: 768px) 50vw, 300px" unoptimized />
                 : <div className="w-full h-full bg-black" />}
             </div>
             <div className="relative w-1/2 md:w-full border-l-2 md:border-l-0 md:border-t-2 border-white" style={{ aspectRatio: '1' }}>
               {release.back_cover_image
-                ? <Image src={release.back_cover_image} alt={`${release.title} Back`} fill style={{ objectFit: 'cover' }} sizes="(max-width: 768px) 50vw, 300px" />
+                ? <Image src={release.back_cover_image} alt={`${release.title} Back`} fill style={{ objectFit: 'cover' }} sizes="(max-width: 768px) 50vw, 300px" unoptimized />
                 : <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#111' }}>
                     <span className="font-display text-xs" style={{ color: '#333' }}>{t('catalogue.noBack')}</span>
                   </div>}
